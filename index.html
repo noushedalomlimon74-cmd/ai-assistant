@@ -4,10 +4,140 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My AI Assistant</title>
+  <title>আমার Personal AI Assistant</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #eef2ff;
+      color: #172033;
+    }
+    main {
+      max-width: 600px;
+      margin: 25px auto;
+      padding: 18px;
+    }
+    h1 { text-align: center; font-size: 25px; }
+    #chat {
+      background: white;
+      padding: 15px;
+      height: 350px;
+      overflow-y: auto;
+      border-radius: 14px;
+      margin: 18px 0;
+      box-shadow: 0 2px 10px #0001;
+    }
+    .msg {
+      padding: 10px 12px;
+      margin: 9px 0;
+      border-radius: 12px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+    .bot { background: #e8edff; }
+    .user { background: #d5f5e3; text-align: right; }
+    .controls { display: flex; gap: 8px; }
+    input {
+      min-width: 0;
+      flex: 1;
+      padding: 13px;
+      border: 1px solid #bbb;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+    button {
+      padding: 12px;
+      border: 0;
+      border-radius: 10px;
+      background: #4058d6;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .extra { display: flex; gap: 10px; margin-top: 10px; }
+    .extra button { flex: 1; }
+    #status { text-align: center; color: #555; font-size: 14px; }
+  </style>
 </head>
 <body>
-  <h1>আমার Personal AI Assistant</h1>
-  <p>স্বাগতম! এটি আমার AI Assistant-এর প্রথম ওয়েবপেজ।</p>
+  <main>
+    <h1>🤖 আমার Personal AI Assistant</h1>
+    <p style="text-align:center">লিখে প্রশ্ন করো অথবা মাইক্রোফোনে কথা বলো।</p>
+
+    <div id="chat" aria-live="polite">
+      <div class="msg bot">স্বাগতম! আমি তোমার Assistant। নিচে প্রশ্ন লেখো, অথবা মাইক্রোফোন ব্যবহার করো।</div>
+    </div>
+
+    <form id="form" class="controls">
+      <input id="question" placeholder="এখানে প্রশ্ন লেখো..." autocomplete="off">
+      <button type="submit">পাঠাও</button>
+    </form>
+
+    <div class="extra">
+      <button id="mic" type="button">🎤 কথা বলো</button>
+      <button id="stop" type="button">🔇 শব্দ বন্ধ</button>
+    </div>
+    <p id="status">প্রস্তুত</p>
+  </main>
+
+  <script>
+    const chat = document.getElementById('chat');
+    const input = document.getElementById('question');
+    const status = document.getElementById('status');
+
+    function addMessage(text, who) {
+      const div = document.createElement('div');
+      div.className = 'msg ' + who;
+      div.textContent = text;
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
+      return div;
+    }
+
+    document.getElementById('form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const q = input.value.trim();
+      if (!q) return;
+      addMessage(q, 'user');
+      input.value = '';
+
+      addMessage(
+        'তোমার চ্যাটবক্স কাজ করছে! প্রকৃত AI উত্তর পেতে পরের ধাপে নিরাপদ AI সার্ভার যুক্ত করতে হবে।',
+        'bot'
+      );
+    });
+
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    document.getElementById('mic').addEventListener('click', function() {
+      if (!SpeechRecognition) {
+        status.textContent = 'এই ব্রাউজারে Speech Recognition নেই। Chrome-এ চেষ্টা করো।';
+        return;
+      }
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'bn-BD';
+      recognition.interimResults = false;
+      recognition.onstart = () => status.textContent = 'শুনছি... এখন কথা বলো';
+      recognition.onresult = event => {
+        input.value = event.results[0][0].transcript;
+        status.textContent = 'কথা লেখায় রূপান্তর হয়েছে। পাঠাও চাপো।';
+      };
+      recognition.onerror = () => status.textContent =
+        'মাইক্রোফোন কাজ করেনি। অনুমতি ও ইন্টারনেট পরীক্ষা করো।';
+      recognition.onend = () => {
+        if (status.textContent === 'শুনছি... এখন কথা বলো') {
+          status.textContent = 'প্রস্তুত';
+        }
+      };
+      recognition.start();
+    });
+
+    document.getElementById('stop').addEventListener('click', function() {
+      window.speechSynthesis?.cancel();
+      status.textContent = 'কণ্ঠ বন্ধ করা হয়েছে';
+    });
+  </script>
 </body>
 </html>
