@@ -163,6 +163,33 @@ function speakAnswer() {
 }
 </script>
 </body>
+<button onclick="speakLastAnswer()">🔊 উত্তর শুনুন</button>
+
+<script>
+function speakLastAnswer() {
+  const answers = document.querySelectorAll('.bot');
+
+  if (answers.length === 0) {
+    alert('আগে একটি উত্তর তৈরি করো।');
+    return;
+  }
+
+  if (!('speechSynthesis' in window)) {
+    alert('এই ব্রাউজারে কথা বলার সুবিধা পাওয়া যাচ্ছে না।');
+    return;
+  }
+
+  const text = answers[answers.length - 1].innerText;
+  window.speechSynthesis.cancel();
+
+  const voice = new SpeechSynthesisUtterance(text);
+  voice.lang = 'bn-BD';
+  voice.rate = 0.9;
+
+  window.speechSynthesis.speak(voice);
+}
+</script>
+
 
 </body>
 </html>
