@@ -139,5 +139,30 @@
       status.textContent = 'কণ্ঠ বন্ধ করা হয়েছে';
     });
   </script>
+<button id="speakBtn" type="button" onclick="speakAnswer()">
+  🔊 উত্তর শুনুন
+</button>
+
+<script>
+function speakAnswer() {
+  const answers = document.querySelectorAll('.bot');
+  
+  if (answers.length === 0) {
+    alert('আগে একটি প্রশ্ন করুন।');
+    return;
+  }
+
+  const text = answers[answers.length - 1].innerText;
+  const speech = new SpeechSynthesisUtterance(text);
+
+  speech.lang = 'bn-BD';
+  speech.rate = 0.9;
+
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(speech);
+}
+</script>
+</body>
+
 </body>
 </html>
